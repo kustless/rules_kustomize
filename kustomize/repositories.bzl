@@ -24,7 +24,6 @@ def kustomize_tools():
             )
             http_file(
                 name = "kustomize_runtime_{os}_{arch}".format(**platform),
-                downloaded_file_path = "kustomize",
                 urls = [github_releases_download],
                 sha256 = platform["sha256"],
             )

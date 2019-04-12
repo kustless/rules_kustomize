@@ -1,8 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-exports_files(glob(["*.bzl"]) + [
-    "kustomize-init.sh.tpl",
-])
+exports_files(glob(["*.bzl"]))
 
 config_setting(
     name = "linux_amd64",
@@ -19,12 +17,12 @@ config_setting(
 )
 
 genrule(
-    name = "kustomize_runtime",
+    name = "bin",
     srcs = select({
         "//kustomize:linux_amd64": ["@kustomize_runtime_linux_amd64//file"],
         "//kustomize:darwin_amd64": ["@kustomize_runtime_darwin_amd64//file"],
     }),
-    outs = ["bin/kustomize"],
+    outs = ["kustomize"],
     cmd = "cp $(<) $(@)",
     executable = True,
     output_to_bindir = 1,

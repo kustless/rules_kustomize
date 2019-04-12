@@ -1,0 +1,9 @@
+load("@com_github_kustless_rules_kustomize//kustomize:build.bzl", "kustomize_build")
+
+kustomize_build(
+    name = "example",
+    srcs = [
+        "kustomization.yaml",
+    ],
+    visibility = ["//visibility:public"],
+)
