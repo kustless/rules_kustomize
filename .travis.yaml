@@ -37,6 +37,6 @@ script:
       --experimental_repository_cache="$HOME/.bazel_repository_cache" \
       --local_resources=400,1,1.0 \
       --test_tag_filters=-dev \
-      @io_bazel_rules_go//...
+      @com_github_kustless_rules_kustomize//...
 notifications:
   email: false
