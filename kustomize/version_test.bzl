@@ -1,5 +1,5 @@
 load("@bazel_skylib//lib:unittest.bzl", "analysistest", "asserts")
-load("@com_github_kustless_rules_kustomize//kustomize:version.bzl", "VersionInfo", "kustomize_version")
+load("@com_github_kustless_rules_kustomize//kustomize:version.bzl", "kustomize_version")
 
 # ==== Check the provider contents ====
 
@@ -10,8 +10,7 @@ def _provider_contents_test_impl(ctx):
     env = analysistest.begin(ctx)
     target_under_test = analysistest.target_under_test(env)
 
-    asserts.true(env, target_under_test[VersionInfo].executable != None)
-    asserts.true(env, len(target_under_test[VersionInfo].runfiles) > 0)
+    asserts.false(env, target_under_test[DefaultInfo].files_to_run == None)
 
     return analysistest.end(env)
 

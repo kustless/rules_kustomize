@@ -1,47 +1,48 @@
-BuildInfo = provider()
+SCRIPT_TEMPLATE = """\
+#!/bin/sh
+set -e
+TMP=`mktemp -d`
+STACK=$TMP/{name}
+{cp_cmds}
+{bin} build $STACK/{path} > {out}
+rm -r $TMP
+"""
 
 def _kustomize_build_impl(ctx):
-    # build the directory
-    build = " ".join([
-        ctx.executable.bin.path,
-        "build",
-        "--output %s" % ctx.outputs.manifests.path,
-    ])
+    cp_each = "mkdir -p $STACK/{dirname} && cp {path} $STACK/{dirname}"
+    cp_cmds = [cp_each.format(dirname = f.dirname, path = f.path) for f in ctx.files.srcs]
 
-    cp_cmds = []
-    for f in ctx.files.srcs:
-        suffix = f.path[len(ctx.label.package) + 1:]
-        cp_cmds.append("mkdir -p $STACK && cp %s $STACK/%s" % (f.path, suffix))
-
-    ctx.action(
-        inputs = ctx.files.srcs + ctx.files.bin,
-        outputs = [ctx.outputs.manifests],
-        command = "\n".join([
-            "set -e",
-            "TMP=`mktemp -d`",
-            "STACK=$TMP/%s" % (ctx.attr.name,),
-            "\n".join(cp_cmds),
-            "%s $STACK" % (build,),
-            "rm -r $TMP",
-        ]),
+    script = ctx.actions.declare_file("%s-run.sh" % ctx.label.name)
+    script_content = SCRIPT_TEMPLATE.format(
+        name = ctx.label.name,
+        cp_cmds = cp_cmds,
+        bin = ctx.executable._bin.basename,
+        path = ctx.attr.path,
+        out = ctx.outputs.out or "%s.out.yaml" % ctx.label.name,
     )
-    return [BuildInfo(val = "done", out = ctx.outputs.manifests)]
+    ctx.actions.write(script, script_content, is_executable = True)
+
+    runfiles = ctx.runfiles(files = [ctx.executable._bin] + ctx.files.srcs)
+
+    return [DefaultInfo(executable = script, runfiles = runfiles)]
 
 kustomize_build = rule(
     attrs = {
+        "path": attr.string(
+            default = ".",
+        ),
         "srcs": attr.label_list(
             mandatory = True,
             allow_files = True,
         ),
-        "bin": attr.label(
-            default = Label("//kustomize:bin"),
+        "_bin": attr.label(
             executable = True,
-            single_file = True,
-            allow_files = True,
             cfg = "host",
+            allow_files = True,
+            default = Label("//kustomize:bin"),
         ),
+        "out": attr.output(),
     },
-    outputs = {"manifests": "%{name}.out.yaml"},
     implementation = _kustomize_build_impl,
     executable = False,
 )
