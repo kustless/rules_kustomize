@@ -27,3 +27,13 @@ genrule(
     executable = True,
     output_to_bindir = 1,
 )
+
+load(":version.bzl", "kustomize_version")
+
+kustomize_version(
+    name = "version",
+)
+
+# # Call a macro that defines targets that perform the tests at analysis time,
+# # and that can be executed with "bazel test" to return the result.
+# build_test_suite()

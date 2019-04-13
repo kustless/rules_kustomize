@@ -1,3 +1,5 @@
+BuildInfo = provider()
+
 def _kustomize_build_impl(ctx):
     # build the directory
     build = " ".join([
@@ -23,6 +25,7 @@ def _kustomize_build_impl(ctx):
             "rm -r $TMP",
         ]),
     )
+    return [BuildInfo(val = "done", out = ctx.outputs.manifests)]
 
 kustomize_build = rule(
     attrs = {
