@@ -1,0 +1,7 @@
+load("@com_github_kustless_rules_kustomize//kustomize:init.bzl", "kustomize_init")
+
+kustomize_init(
+    name = "init",
+    out = "kustomization.yaml",
+    visibility = ["//visibility:public"],
+)
