@@ -11,7 +11,7 @@ os:
   - osx
 
 env:
-  - V=0.23.2
+  - V=0.25.2
 
 before_install:
   - |
